@@ -72,7 +72,6 @@ class NeuralNet():
         self.Weights = {} ; self.Biases = {}
         self.Weights_grad = {} ; self.Biases_grad = {}
         self.Z = {} ; self.A = {} ; self.C = {}
-        self.A['A0'] = self.xTrain
 
         for i in range(len(self.activations)):
 
@@ -119,14 +118,15 @@ class NeuralNet():
             return 1*(x >= 0)
 
         elif act_func == None:
-            return x
+            return 1
         else:
             print("Invalid activation function. Either 'sigmoid', 'tanh', 'relu', or None.\nExiting...")
             sys.exit(0)
 
 
-    def feed_forward(self, x):
+    def feed_forward(self, x, isTraining = True):
 
+        self.A['A0'] = x
         for i in range(self.nLayers):
 
             z = self.A['A'+str(i)] @ self.Weights['W'+str(i+1)] + self.Biases['B'+str(i+1)]
@@ -134,12 +134,18 @@ class NeuralNet():
             self.Z['Z'+str(i+1)] = z
             self.A['A'+str(i+1)] = a
 
-        self.output = a
+        if isTraining:
+            self.output = a
+        else:
+            return a
 
 
-    def backpropagation(self):
+    def backpropagation(self, yTrue = None):
 
-        error_out = self.yTrain - self.output
+        if yTrue is None:
+            yTrue = self.Train
+
+        error_out = yTrue - self.output
         cost = 1.0/self.nTrain*(error_out)**2
 
         for i in range(self.nLayers, 0, -1):
@@ -147,7 +153,7 @@ class NeuralNet():
             if i == self.nLayers:
                 c = -2/self.nTrain*error_out
             else:
-                c = c @ self.Weights['W'+str(i)]
+                c = c @ self.Weights['W'+str(i+1)].T
 
             c = c * self.activation_derivative(self.A['A'+str(i)], self.activations[i-1])
             grad_w = self.A['A'+str(i-1)].T @ c
@@ -156,15 +162,28 @@ class NeuralNet():
             self.Weights_grad['dW'+str(i)] = grad_w
             self.Biases_grad['dB'+str(i)] = grad_b
 
-            self.Weights['W'+str(i)] -= 0.001*grad_w
-            self.Biases['B'+str(i)] -= 0.001*grad_b
+            self.Weights['W'+str(i)] -= 0.5*grad_w
+            self.Biases['B'+str(i)] -= 0.5*grad_b
 
-    def TrainNN(self):
+    def TrainNN(self, steps = 300000, batchSize = 200):
 
-        self.feed_forward(self.xTrain)
-        print(1.0/self.nTrain*np.sum((self.yTrain - self.output)**2))
+        num_batch = int(self.nTrain/batchSize)
 
-        for i in range(100000):
-            self.feed_forward(self.xTrain)
-            self.backpropagation()
-        print(1.0/self.nTrain*np.sum((self.yTrain - self.output)**2))
+        for epoch in range(steps +1):
+
+            indices = np.random.choice(self.nTrain, self.nTrain, replace=False)
+
+            for b in range(num_batch):
+
+                batch = indices[b*batchSize:(b+1)*batchSize]
+                xBatch = self.xTrain[batch]
+                yBatch = self.yTrain[batch]
+
+                self.feed_forward(xBatch)
+                self.backpropagation(yBatch)
+
+            if epoch == 0 or epoch % 1000 == 0:
+
+                trainError = 1.0/self.nTrain*np.sum((self.yTrain - self.feed_forward(self.xTrain, isTraining=False))**2)
+                testError =  1.0/self.nTest*np.sum((self.yTest - self.feed_forward(self.xTest, isTraining=False))**2)
+                print("Error after %i epochs, Training:  %.7f, Test:  %.7f" %(epoch, trainError,testError))
