@@ -110,12 +110,13 @@ class LinReg:
 
         #beta = scl.inv(xData.T @ xData) @ xData.T @ z
         beta = np.linalg.pinv(xData) @ yData
-
+        """
         ypredict = xData @ beta
         vary = 1.0/(xData.shape[0])*np.sum((yData - ypredict)**2)
         var = np.linalg.pinv(xData.T @ xData)*vary
         self.var_ols = var
         self.conf_ols = 1.96*np.sqrt(np.diag(var))
+        """
         return beta
 
     # @check_types(np.ndarray, np.ndarray)
@@ -137,12 +138,14 @@ class LinReg:
         I = np.identity(xData.shape[1])
         xData_inv = scl.inv(xData.T @ xData + self.lamb*I)
         beta = xData_inv @ xData.T @ yData
+        """
         ypredict = xData @ beta
         vary = 1.0/(xData.shape[0])*np.sum((yData - ypredict)**2)
 
         var = xData_inv @ xData.T @ xData @ xData_inv.T * vary
         self.var_ridge = var
         self.conf_ridge = 1.96*np.sqrt(np.diag(var))
+        """
         return beta
 
 
@@ -162,7 +165,7 @@ class LinReg:
         if xData is None: xData = self.xData
         if yData is None: yData = self.yData
 
-        lass = Lasso([float(self.lamb)], fit_intercept=False, max_iter = 5000)
+        lass = Lasso([float(self.lamb)], fit_intercept=False)#, max_iter = 5000)
         lass.fit(xData, yData)
 
         beta = (lass.coef_).reshape(xData.shape[1], 1)
@@ -223,6 +226,8 @@ class LinReg:
         ypreds = np.zeros((nBoots, nTest))
         train_errors = np.zeros(nBoots)
         test_errors = np.zeros(nBoots)
+        train_r2 = np.zeros(nBoots)
+        test_r2 = np.zeros(nBoots)
 
         for i in tqdm(range(nBoots)):
             idx = np.random.choice(nTrain, nTrain)
@@ -236,15 +241,19 @@ class LinReg:
             ypreds[i] = ypred_test.flatten()
             train_errors[i] = self.MSE(yboot, ypred_train)
             test_errors[i] = self.MSE(self.yTest, ypred_test)
+            train_r2[i] = self.R2(yboot, ypred_train)
+            test_r2[i] = self.R2(self.yTest, ypred_test)
 
         train_error = np.average(train_errors)
         test_error = np.average(test_errors)
+        train_r2 = np.average(train_r2)
+        test_r2 = np.average(test_r2)
 
         y_avg = np.average(ypreds, axis = 0).reshape(-1, 1)
         variance = np.average(np.var(ypreds, axis = 0))
         bias = np.average((self.yTest - y_avg)**2)
 
-        return bias, variance, train_error, test_error
+        return bias, variance, train_error, test_error, train_r2, test_r2
 
     # @check_types(int, MethodType)
     def kfold(self, nfolds, regressionmethod):

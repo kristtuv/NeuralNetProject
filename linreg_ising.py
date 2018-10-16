@@ -3,11 +3,94 @@ import scipy.sparse as sp
 import scipy.linalg as scl
 from cls_reg import LinReg
 import matplotlib.pylab as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 np.random.seed(12)
 
 import warnings
 warnings.filterwarnings('ignore')
+
+def boot_stats():
+
+    lambdas = np.logspace(-4, 5,10)
+    model = LinReg(X, Y)
+
+
+    models = []
+    print("Bootstrapping models:")
+    for regmethod in ['ols', 'ridge', 'lasso']:
+
+        method = getattr(model, regmethod)
+
+        for lamb in lambdas:
+
+            model.lamb = lamb
+
+            # J = method(model.xTrain, model.yTrain)
+            # Ypred_train = model.xTrain @ J
+            # Ypred_test = model.xTest @ J
+            #
+            # mse_train = model.MSE(model.yTrain, Ypred_train)
+            # mse_test = model.MSE(model.yTest, Ypred_test)
+            # r2_train = model.R2(model.yTrain, Ypred_train)
+            # r2_test = model.R2(model.yTest, Ypred_test)
+
+
+            bias, variance, mse_train, mse_test, r2_train, r2_test = model.bootstrap(100, method)
+            models.append([regmethod, lamb, mse_train, mse_test,\
+                    r2_train, r2_test, bias, variance])
+
+            if regmethod == 'ols':
+                break
+
+    print("\nMODEL ANALYSIS (BOOTSTRAP):")
+    print("="*85)
+    print(" Method | lambda | MSE Train | MSE Test | R2 Train |  R2 Test |   Bias   | Variance")
+    print("-"*85)
+
+    for i in range(len(models)):
+        print("%8s|%8g|%11g|%10f|%10f|%10f|%10f|%10g|" % tuple(models[i]))
+
+    print("-"*85)
+
+def plot_stuff():
+
+    model = LinReg(X,Y)
+
+    fig, axarr = plt.subplots(nrows=2, ncols=3)
+    cmap_args=dict(vmin=-1., vmax=1., cmap='seismic')
+
+    lambdas = [0.0001, 0.01]
+    for i in range(len(lambdas)):
+
+        model.lamb = lambdas[i]
+
+        J_ols = model.ols().reshape(L,L)
+        J_ridge = model.ridge().reshape(L,L)
+        J_lasso = model.lasso().reshape(L,L)
+
+        axarr[i][0].imshow(J_ols,**cmap_args)
+        axarr[i][0].set_title('$\\mathrm{OLS}$',fontsize=16)
+        axarr[i][0].tick_params(labelsize=16)
+
+        axarr[i][1].imshow(J_ridge,**cmap_args)
+        axarr[i][1].set_title('$\\mathrm{Ridge},\ \\lambda=%.4f$' %(lambdas[i]),fontsize=16)
+        axarr[i][1].tick_params(labelsize=16)
+
+        im=axarr[i][2].imshow(J_lasso,**cmap_args)
+        axarr[i][2].set_title('$\\mathrm{LASSO},\ \\lambda=%.4f$' %(lambdas[i]),fontsize=16)
+        axarr[i][2].tick_params(labelsize=16)
+
+        divider = make_axes_locatable(axarr[i][2])
+        cax = divider.append_axes("right", size="5%", pad=0.05)
+        cbar=fig.colorbar(im, cax=cax)
+
+        cbar.ax.set_yticklabels(np.arange(-1.0, 1.0+0.25, 0.25),fontsize=14)
+        cbar.set_label('$J_{i,j}$',labelpad=-40, y=1.12,fontsize=16,rotation=0)
+
+        #fig.subplots_adjust(right=2.0)
+    plt.show()
+
 
 ### define Ising model params
 # system size
@@ -45,23 +128,6 @@ n_samples = 400
 
 X = Data[0][:n_samples]
 Y = Data[1][:n_samples]
-print(Y.shape)
 
-#J = (np.linalg.pinv(X) @ Y).reshape(L, L)
-model = LinReg(X, Y)
-model.lamb = 0.1
-J = model.lasso()
-Ypred = X @ J
-print(model.MSE(Y, Ypred))
-print(model.R2(Y, Ypred))
-
-bias, variance, train_error, test_error = model.bootstrap(1000, model.lasso)
-print(bias, variance, train_error, test_error)
-
-mse_train, mse_test, r2_train, r2_test = model.kfold(10, model.lasso)
-print(mse_train, mse_test, r2_train, r2_test)
-
-cmap_args=dict(vmin=-1., vmax=1., cmap='seismic')
-plt.imshow(J.reshape(L, L), **cmap_args)
-plt.colorbar()
-plt.show()
+if __name__ == "__main__":
+    plot_stuff()
