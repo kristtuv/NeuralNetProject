@@ -5,7 +5,12 @@ import sys
 class NeuralNet():
 
     def __init__(self, xData, yData, nodes=[1, 10, 1], activations=['sigmoid', None]):
+        """
+        Data x
+        data y
+        arcitecture = nodes and type of activation in each node
 
+        """
         self.xData = xData
         self.yData = yData
 
@@ -182,7 +187,7 @@ class NeuralNet():
                 self.feed_forward(xBatch)
                 self.backpropagation(yBatch)
 
-            if epoch == 0 or epoch % 1000 == 0:
+            if epoch == 0 or epoch % 1 == 0:
 
                 trainError = 1.0/self.nTrain*np.sum((self.yTrain - self.feed_forward(self.xTrain, isTraining=False))**2)
                 testError =  1.0/self.nTest*np.sum((self.yTest - self.feed_forward(self.xTest, isTraining=False))**2)
