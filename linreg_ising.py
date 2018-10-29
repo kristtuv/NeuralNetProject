@@ -10,6 +10,51 @@ np.random.seed(12)
 import warnings
 warnings.filterwarnings('ignore')
 
+def stats():
+
+    lambdas = np.logspace(-4, 5,10)
+    model = LinReg(X, Y)
+
+
+    models = []
+    for regmethod in ['ols', 'ridge', 'lasso']:
+
+        method = getattr(model, regmethod)
+
+        for lamb in lambdas:
+
+            model.lamb = lamb
+
+            J = method(model.xTrain, model.yTrain)
+            Ypred_train = model.xTrain @ J
+            Ypred_test = model.xTest @ J
+
+            mse_train = model.MSE(model.yTrain, Ypred_train)
+            mse_test = model.MSE(model.yTest, Ypred_test)
+            r2_train = model.R2(model.yTrain, Ypred_train)
+            r2_test = model.R2(model.yTest, Ypred_test)
+
+            models.append([regmethod, lamb, mse_train, mse_test,\
+                    r2_train, r2_test])
+
+            if regmethod == 'ols':
+                break
+
+    print("\nMODEL ANALYSIS:")
+    print("="*85)
+    print(" Method | lambda | MSE Train | MSE Test | R2 Train |  R2 Test |")
+    print("-"*85)
+
+    for i in range(len(models)):
+        print("%8s|%8g|%11g|%10f|%10f|%10f|" % tuple(models[i]))
+
+    print("-"*85)
+
+
+    #r2s = np.array([models[i][4:] for i in range(len(models))])
+    #plt.semilogx(lambdas, np.tile(r2s[0], (len(lambdas),1)))
+    #plt.show()
+
 def boot_stats():
 
     lambdas = np.logspace(-4, 5,10)
@@ -25,16 +70,6 @@ def boot_stats():
         for lamb in lambdas:
 
             model.lamb = lamb
-
-            # J = method(model.xTrain, model.yTrain)
-            # Ypred_train = model.xTrain @ J
-            # Ypred_test = model.xTest @ J
-            #
-            # mse_train = model.MSE(model.yTrain, Ypred_train)
-            # mse_test = model.MSE(model.yTest, Ypred_test)
-            # r2_train = model.R2(model.yTrain, Ypred_train)
-            # r2_test = model.R2(model.yTest, Ypred_test)
-
 
             bias, variance, mse_train, mse_test, r2_train, r2_test = model.bootstrap(100, method)
             models.append([regmethod, lamb, mse_train, mse_test,\
@@ -65,9 +100,9 @@ def plot_stuff():
 
         model.lamb = lambdas[i]
 
-        J_ols = model.ols().reshape(L,L)
-        J_ridge = model.ridge().reshape(L,L)
-        J_lasso = model.lasso().reshape(L,L)
+        J_ols = model.ols()[1:].reshape(L,L)
+        J_ridge = model.ridge()[1:].reshape(L,L)
+        J_lasso = model.lasso()[1:].reshape(L,L)
 
         axarr[i][0].imshow(J_ols,**cmap_args)
         axarr[i][0].set_title('$\\mathrm{OLS}$',fontsize=16)
@@ -129,5 +164,9 @@ n_samples = 400
 X = Data[0][:n_samples]
 Y = Data[1][:n_samples]
 
+#X = np.c_[np.ones(X.shape[0]), X]
+
 if __name__ == "__main__":
-    plot_stuff()
+    #plot_stuff()
+    #boot_stats()
+    stats()

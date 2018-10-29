@@ -41,7 +41,7 @@ def testing_of_nn():
     plt.plot(xPlot, yPlot, label="Exact")
     #plt.plot(nn.xTrain, nn.output, label= "Before")
 
-    nn.TrainNN()
+    nn.TrainNN(epochs = 400000, eta = 0.1, n_print = 1000)
 
     output = nn.feed_forward(nn.xTrain, isTraining=False)
     p = np.argsort(nn.xTrain.flatten())
@@ -51,23 +51,34 @@ def testing_of_nn():
 
 
 if __name__=='__main__':
+
     np.random.seed(12)
     L = 40
     n_states = 10000
-    states = ising_create_states(n_states, L) 
+    states = ising_create_states(n_states, L)
     energies=ising_create_energies(states,L).reshape(-1, 1)
     states=np.einsum('...i,...j->...ij', states, states)
     shape=states.shape
     states=states.reshape((shape[0],shape[1]*shape[2]))
-    nn = NeuralNet(states, energies,nodes=[1600, 1], activations=[None]) 
-    nn.TrainNN(steps=400)
+    nn = NeuralNet(states, energies,nodes=[1600, 1], activations=[None], regularization='l2', lamb = 10000.0)
+    nn.TrainNN(epochs=101)
     output = nn.feed_forward(nn.xTrain, isTraining=False)
-    print(output[:10])
-    print(nn.yTrain[:10])
-    # p = np.argsort(nn.xTrain.flatten())
-    # plt.plot(nn.xTrain[p], output[p], label = "After")
-    # plt.legend()
-    # plt.show()
+    #print(output[:10])
+    #print(nn.yTrain[:10])
+
+    J = nn.Weights['W1'].reshape(40, 40)
+
+    plt.imshow(J, cmap = 'seismic', vmin=-1.0, vmax=1.0)
+    plt.colorbar()
+    plt.show()
+
+
+
+    #testing_of_nn()
+    #p = np.argsort(nn.xTrain.flatten())
+    #plt.plot(nn.xTrain[p], output[p], label = "After")
+    #plt.legend()
+    #plt.show()
 
 
 
@@ -83,4 +94,3 @@ if __name__=='__main__':
     # Y_test=Data[1][n_samples:3*n_samples//2] #+ np.random.normal(0,4.0,size=X_test.shape[0])
     # print(Y_test)
     # print(states.shape)
-

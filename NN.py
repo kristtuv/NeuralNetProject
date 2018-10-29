@@ -4,7 +4,15 @@ import sys
 
 class NeuralNet():
 
-    def __init__(self, xData, yData, nodes=[1, 10, 1], activations=['sigmoid', None]):
+    def __init__(
+        self,
+        xData,
+        yData,
+        nodes=[1, 10, 1],
+        activations=['sigmoid', None],
+        cost_func='mse',
+        regularization=None,
+        lamb = 0.0):
         """
         Data x
         data y
@@ -13,6 +21,10 @@ class NeuralNet():
         """
         self.xData = xData
         self.yData = yData
+        self.N = xData.shape[0]
+        self.cost_func = cost_func
+        self.regularization = regularization
+        self.lamb = lamb
 
         if len(nodes) != (len(activations) +1):
             print("Error: invaled lengths of 'nodes' and 'activations.")
@@ -48,7 +60,7 @@ class NeuralNet():
         yData = self.yData
 
         if shuffle:
-            randomize = np.arange(xData.shape[0])
+            randomize = np.arange(self.N)
             np.random.shuffle(randomize)
             xData = xData[randomize]
             yData = yData[randomize]
@@ -61,7 +73,7 @@ class NeuralNet():
             self.yFolds = yFolds
 
         if frac != None:
-            nTest = int(np.floor(frac*xData.shape[0]))
+            nTest = int(np.floor(frac*self.N))
             xTrain = xData[:-nTest]
             xTest = xData[-nTest:]
 
@@ -128,6 +140,37 @@ class NeuralNet():
             print("Invalid activation function. Either 'sigmoid', 'tanh', 'relu', or None.\nExiting...")
             sys.exit(0)
 
+    def softmax(self, act):
+
+        # Subtraction of max value for numerical stability
+        self.act_exp = np.exp(act - np.max(act))
+
+        return act_exp/np.sum(act_exp)
+
+    def cost_function(self, y, ypred):
+
+        if self.cost_func == 'mse':
+
+            cost =  0.5/y.shape[0]*np.sum((y - ypred)**2)
+
+        if self.cost_func == 'log':
+
+            cost =  0.5/y.shape[0]*(np.log(self.act_exp) - self.output[y.flatten()])
+            #return - 1.0/y.shape[0]*np.sum(y*np.log(ypred) + (1-y)*np.log(1 - ypred), axis = 0)
+
+        if self.regularization == 'l2':
+
+            for key in list(self.Weights.keys()):
+                cost += self.lamb/(2*y.shape[0])*np.sum(Weights[key]**2)
+
+        return cost
+
+
+    def cost_function_derivative(self, y, ypred):
+
+        if self.cost_func == 'mse':
+            return -1.0/y.shape[0]*(y - ypred)
+
 
     def feed_forward(self, x, isTraining = True):
 
@@ -139,10 +182,17 @@ class NeuralNet():
             self.Z['Z'+str(i+1)] = z
             self.A['A'+str(i+1)] = a
 
+        if self.cost_func == 'log':
+
+            a = self.softmax(a)
+
+        #self.output = a
+
         if isTraining:
             self.output = a
         else:
             return a
+
 
 
     def backpropagation(self, yTrue = None):
@@ -150,13 +200,10 @@ class NeuralNet():
         if yTrue is None:
             yTrue = self.Train
 
-        error_out = yTrue - self.output
-        cost = 1.0/self.nTrain*(error_out)**2
-
         for i in range(self.nLayers, 0, -1):
 
             if i == self.nLayers:
-                c = -2/self.nTrain*error_out
+                c = self.cost_function_derivative(yTrue, self.output)
             else:
                 c = c @ self.Weights['W'+str(i+1)].T
 
@@ -167,14 +214,22 @@ class NeuralNet():
             self.Weights_grad['dW'+str(i)] = grad_w
             self.Biases_grad['dB'+str(i)] = grad_b
 
-            self.Weights['W'+str(i)] -= 0.5*grad_w
-            self.Biases['B'+str(i)] -= 0.5*grad_b
+            if self.regularization == 'l2':
+                self.Weights['W'+str(i)] -= self.eta*(grad_w + self.lamb/yTrue.shape[0]*self.Weights['W'+str(i)])
+            else:
+                self.Weights['W'+str(i)] -= self.eta*grad_w
 
-    def TrainNN(self, steps = 300000, batchSize = 200):
+            self.Biases['B'+str(i)] -= self.eta*grad_b
+
+
+
+    def TrainNN(self, epochs = 300000, batchSize = 200, eta = 0.01, n_print = 100):
+
+        self.eta = eta
 
         num_batch = int(self.nTrain/batchSize)
 
-        for epoch in range(steps +1):
+        for epoch in range(epochs +1):
 
             indices = np.random.choice(self.nTrain, self.nTrain, replace=False)
 
@@ -187,8 +242,8 @@ class NeuralNet():
                 self.feed_forward(xBatch)
                 self.backpropagation(yBatch)
 
-            if epoch == 0 or epoch % 1 == 0:
+            if epoch == 0 or epoch % n_print == 0:
 
                 trainError = 1.0/self.nTrain*np.sum((self.yTrain - self.feed_forward(self.xTrain, isTraining=False))**2)
                 testError =  1.0/self.nTest*np.sum((self.yTest - self.feed_forward(self.xTest, isTraining=False))**2)
-                print("Error after %i epochs, Training:  %.7f, Test:  %.7f" %(epoch, trainError,testError))
+                print("Error after %i epochs, Training:  %g, Test:  %g" %(epoch, trainError,testError))
