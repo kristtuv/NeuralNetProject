@@ -159,14 +159,27 @@ states=states.reshape((shape[0],shape[1]*shape[2]))
 energies = energies.reshape(-1, 1)
 Data=[states,energies]
 
-n_samples = 400
+n_samples = 10000
 
 X = Data[0][:n_samples]
 Y = Data[1][:n_samples]
+
+model = LinReg(X, Y)
+beta = model.ols()
+
+e_train = model.xTrain @ beta
+e_test = model.xTest @ beta
+print(model.MSE(model.yTrain, e_train))
+print(model.MSE(model.yTest, e_test))
+
+plt.imshow(beta.reshape(L,L), cmap='seismic', vmin = -1, vmax = 1)
+plt.colorbar()
+plt.show()
 
 #X = np.c_[np.ones(X.shape[0]), X]
 
 if __name__ == "__main__":
     #plot_stuff()
     #boot_stats()
-    stats()
+    #stats()
+    pass

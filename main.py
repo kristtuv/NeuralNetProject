@@ -60,7 +60,8 @@ if __name__=='__main__':
     states=np.einsum('...i,...j->...ij', states, states)
     shape=states.shape
     states=states.reshape((shape[0],shape[1]*shape[2]))
-    nn = NeuralNet(states, energies,nodes=[1600, 1], activations=[None], regularization='l2', lamb = 10000.0)
+    #nn = NeuralNet(states, energies,nodes=[1600, 1], activations=[None], regularization='l2', lamb = 10000.0)
+    nn = NeuralNet(states, energies,nodes=[1600, 1], activations=[None])
     nn.TrainNN(epochs=101)
     output = nn.feed_forward(nn.xTrain, isTraining=False)
     #print(output[:10])

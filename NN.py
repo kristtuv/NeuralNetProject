@@ -143,9 +143,10 @@ class NeuralNet():
     def softmax(self, act):
 
         # Subtraction of max value for numerical stability
-        self.act_exp = np.exp(act - np.max(act))
+        act_exp = np.exp(act - np.max(act))
+        self.act_exp = act_exp
 
-        return act_exp/np.sum(act_exp)
+        return act_exp/np.sum(act_exp, axis=1, keepdims=True)
 
     def cost_function(self, y, ypred):
 
@@ -155,8 +156,10 @@ class NeuralNet():
 
         if self.cost_func == 'log':
 
-            cost =  0.5/y.shape[0]*(np.log(self.act_exp) - self.output[y.flatten()])
+            #error = self.act_exp[np.arange(self.act_exp.shape[0]),
+            #cost =  0.5/y.shape[0]*(np.log(self.act_exp[y.flatten()]) - self.output[y.flatten()])
             #return - 1.0/y.shape[0]*np.sum(y*np.log(ypred) + (1-y)*np.log(1 - ypred), axis = 0)
+            return -0.5/y.shape[0]*np.sum(np.log(ypred[np.arange(ypred.shape[0]), y.flatten()]))
 
         if self.regularization == 'l2':
 
@@ -171,6 +174,15 @@ class NeuralNet():
         if self.cost_func == 'mse':
             return -1.0/y.shape[0]*(y - ypred)
 
+        elif self.cost_func == 'log':
+            ypred[np.arange(ypred.shape[0]), y.flatten()] -= 1
+            return 1.0/y.shape[0]*ypred
+
+    def accuracy(self, y, ypred):
+
+        cls_pred = np.argmax(ypred, axis=1)
+        return 1.0/y.shape[0]*np.sum(cls_pred == y)
+
 
     def feed_forward(self, x, isTraining = True):
 
@@ -183,7 +195,6 @@ class NeuralNet():
             self.A['A'+str(i+1)] = a
 
         if self.cost_func == 'log':
-
             a = self.softmax(a)
 
         #self.output = a
@@ -198,7 +209,7 @@ class NeuralNet():
     def backpropagation(self, yTrue = None):
 
         if yTrue is None:
-            yTrue = self.Train
+            yTrue = self.yTrain
 
         for i in range(self.nLayers, 0, -1):
 
@@ -206,8 +217,8 @@ class NeuralNet():
                 c = self.cost_function_derivative(yTrue, self.output)
             else:
                 c = c @ self.Weights['W'+str(i+1)].T
+                c = c * self.activation_derivative(self.A['A'+str(i)], self.activations[i-1])
 
-            c = c * self.activation_derivative(self.A['A'+str(i)], self.activations[i-1])
             grad_w = self.A['A'+str(i-1)].T @ c
             grad_b = np.sum(c, axis= 0)
 
@@ -215,7 +226,7 @@ class NeuralNet():
             self.Biases_grad['dB'+str(i)] = grad_b
 
             if self.regularization == 'l2':
-                self.Weights['W'+str(i)] -= self.eta*(grad_w + self.lamb/yTrue.shape[0]*self.Weights['W'+str(i)])
+                self.Weights['W'+str(i)] -= self.eta*(grad_w +   self.lamb/yTrue.shape[0]*self.Weights['W'+str(i)])
             else:
                 self.Weights['W'+str(i)] -= self.eta*grad_w
 
@@ -244,6 +255,16 @@ class NeuralNet():
 
             if epoch == 0 or epoch % n_print == 0:
 
-                trainError = 1.0/self.nTrain*np.sum((self.yTrain - self.feed_forward(self.xTrain, isTraining=False))**2)
-                testError =  1.0/self.nTest*np.sum((self.yTest - self.feed_forward(self.xTest, isTraining=False))**2)
+                #trainError = 1.0/self.nTrain*np.sum((self.yTrain - self.feed_forward(self.xTrain, isTraining=False))**2)
+                #testError =  1.0/self.nTest*np.sum((self.yTest - self.feed_forward(self.xTest, isTraining=False))**2)
+                ypred_train = self.feed_forward(self.xTrain, isTraining=False)
+                ypred_test = self.feed_forward(self.xTest, isTraining=False)
+                trainError = self.cost_function(self.yTrain, ypred_train)
+                testError = self.cost_function(self.yTest, ypred_test)
                 print("Error after %i epochs, Training:  %g, Test:  %g" %(epoch, trainError,testError))
+
+                if self.cost_func == 'log':
+                    trainAcc = self.accuracy(self.yTrain, ypred_train)
+                    testAcc = self.accuracy(self.yTest, ypred_test)
+                    print("Accuracy after %i epochs, Training:   %g %%, Test:   %g %%\n" %(epoch, trainAcc, testAcc))
+                    #print("-"*75)
