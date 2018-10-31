@@ -181,7 +181,7 @@ class NeuralNet():
     def accuracy(self, y, ypred):
 
         cls_pred = np.argmax(ypred, axis=1)
-        return 1.0/y.shape[0]*np.sum(cls_pred == y)
+        return 100.0/y.shape[0]*np.sum(cls_pred == y)
 
 
     def feed_forward(self, x, isTraining = True):

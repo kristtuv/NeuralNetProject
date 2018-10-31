@@ -30,7 +30,7 @@ def fetch_data():
     X=np.concatenate((X_ordered,X_disordered))
     Y=np.concatenate((Y_ordered,Y_disordered))
 
-    return X, Y
+    return X, Y, X_critical, Y_critical
 
 if __name__ == '__main__':
     fetch_data()
