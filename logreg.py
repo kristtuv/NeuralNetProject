@@ -68,23 +68,37 @@ class LogReg_Ising():
 
 
 
-    def optimize(self, method = 'SGD'):
+    def optimize(
+        self,
+        method = 'SGD',
+        m = 100,
+        epochs = 100,
+        eta = 'schedule',
+        regularization=None,
+        lamb = 0.0):
 
         X_train = self.X_train ; X_test = self.X_test
         Y_train = self.Y_train ; Y_test = self.Y_test
         J = self.J
 
-        m = self.X_train.shape[0]
         batchSize = int(X_train.shape[0]/m)
         print("Batch size: ", batchSize)
 
-        epochs = 100
-        lamb = 0.1
-        #eta = 0.01
-        t0 = 5 ; t1 = 50
+        if eta == 'schedule':
+            t0 = 5 ; t1 = 50
+            learning_schedule = lambda t : t0/(t + t1)
+        else:
+            learning_schedule = lambda t : eta
 
-        def learning_schedule(t):
-            return t0/(t + t1)
+        if regularization == 'l2':
+            reg_cost = lambda J: lamb*np.sum(J**2)
+            reg_grad = lambda J: 2*lamb*J
+        elif regularization == 'l1':
+            reg_cost = lambda J: lamb*np.sum(np.abs(J))
+            reg_grad = lambda J: lamb*np.sign(J)
+        elif regularization == None:
+            reg_cost = lambda J: 0
+            reg_grad = lambda J: 0
 
         #Stochastic Gradient Descent (SGD)
         for epoch in range(epochs + 1):
@@ -105,18 +119,18 @@ class LogReg_Ising():
                 y = xBatch @ J
                 p = np.exp(y)/(1 + np.exp(y))
                 eta = learning_schedule(epoch*m+i)
-                dJ = -(xBatch.T @ (yBatch - p) - 2*lamb*J)/xBatch.shape[0]
+                dJ = -(xBatch.T @ (yBatch - p) - reg_grad(J))/xBatch.shape[0]
                 J -= eta*dJ
 
             if epoch % 10 == 0 or epoch == 0:
 
                 logit_train = X_train @ J
-                train_cost = (-np.sum((Y_train * logit_train) - np.log(1 + np.exp(logit_train))) + lamb*np.sum(J**2))/X_train.shape[0]
+                train_cost = (-np.sum((Y_train * logit_train) - np.log(1 + np.exp(logit_train))) + reg_cost(J))/X_train.shape[0]
                 p_train = np.exp(logit_train)/(1 + np.exp(logit_train))
                 train_accuracy = np.sum((p_train > 0.5) == Y_train)/X_train.shape[0]
 
                 logit_test = X_test @ J
-                test_cost = (-np.sum((Y_test * logit_test) - np.log(1 + np.exp(logit_test))) + lamb*np.sum(J**2))/X_test.shape[0]
+                test_cost = (-np.sum((Y_test * logit_test) - np.log(1 + np.exp(logit_test))) + reg_cost(J))/X_test.shape[0]
                 p_test = np.exp(logit_test)/(1 + np.exp(logit_test))
                 test_accuracy = np.sum((p_test > 0.5) == Y_test)/X_test.shape[0]
 
@@ -129,4 +143,4 @@ class LogReg_Ising():
 if __name__ == '__main__':
 
     logreg = LogReg_Ising()
-    logreg.optimize()
+    logreg.optimize(m = 1000, regularization='l1', lamb = 0.1)

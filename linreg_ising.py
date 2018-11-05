@@ -46,7 +46,7 @@ def stats():
     print("-"*85)
 
     for i in range(len(models)):
-        print("%8s|%8g|%11g|%10f|%10f|%10f|" % tuple(models[i]))
+        print("%8s|%8g|%11g|%10g|%10f|%10f|" % tuple(models[i]))
 
     print("-"*85)
 
@@ -84,7 +84,7 @@ def boot_stats():
     print("-"*85)
 
     for i in range(len(models)):
-        print("%8s|%8g|%11g|%10f|%10f|%10f|%10f|%10g|" % tuple(models[i]))
+        print("%8s|%8g|%11g|%10g|%10f|%10f|%10f|%10g|" % tuple(models[i]))
 
     print("-"*85)
 
@@ -100,9 +100,9 @@ def plot_stuff():
 
         model.lamb = lambdas[i]
 
-        J_ols = model.ols()[1:].reshape(L,L)
-        J_ridge = model.ridge()[1:].reshape(L,L)
-        J_lasso = model.lasso()[1:].reshape(L,L)
+        J_ols = model.ols().reshape(L,L)
+        J_ridge = model.ridge().reshape(L,L)
+        J_lasso = model.lasso().reshape(L,L)
 
         axarr[i][0].imshow(J_ols,**cmap_args)
         axarr[i][0].set_title('$\\mathrm{OLS}$',fontsize=16)
@@ -163,9 +163,10 @@ n_samples = 10000
 
 X = Data[0][:n_samples]
 Y = Data[1][:n_samples]
+#X = np.c_[np.ones(X.shape[0]), X]
 
 model = LinReg(X, Y)
-beta = model.ols()
+beta = model.ols(model.xTrain, model.yTrain)
 
 e_train = model.xTrain @ beta
 e_test = model.xTest @ beta
@@ -176,10 +177,8 @@ plt.imshow(beta.reshape(L,L), cmap='seismic', vmin = -1, vmax = 1)
 plt.colorbar()
 plt.show()
 
-#X = np.c_[np.ones(X.shape[0]), X]
 
 if __name__ == "__main__":
-    #plot_stuff()
+    plot_stuff()
     #boot_stats()
     #stats()
-    pass
