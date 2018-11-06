@@ -82,6 +82,7 @@ class LogReg_Ising():
         J = self.J
 
         batchSize = int(X_train.shape[0]/m)
+        self.batchSize = batchSize
         print("Batch size: ", batchSize)
 
         if eta == 'schedule':
@@ -125,22 +126,22 @@ class LogReg_Ising():
             if epoch % 10 == 0 or epoch == 0:
 
                 logit_train = X_train @ J
-                train_cost = (-np.sum((Y_train * logit_train) - np.log(1 + np.exp(logit_train))) + reg_cost(J))/X_train.shape[0]
+                self.train_cost = (-np.sum((Y_train * logit_train) - np.log(1 + np.exp(logit_train))) + reg_cost(J))/X_train.shape[0]
                 p_train = np.exp(logit_train)/(1 + np.exp(logit_train))
-                train_accuracy = np.sum((p_train > 0.5) == Y_train)/X_train.shape[0]
+                self.train_accuracy = np.sum((p_train > 0.5) == Y_train)/X_train.shape[0]
 
                 logit_test = X_test @ J
-                test_cost = (-np.sum((Y_test * logit_test) - np.log(1 + np.exp(logit_test))) + reg_cost(J))/X_test.shape[0]
+                self.test_cost = (-np.sum((Y_test * logit_test) - np.log(1 + np.exp(logit_test))) + reg_cost(J))/X_test.shape[0]
                 p_test = np.exp(logit_test)/(1 + np.exp(logit_test))
-                test_accuracy = np.sum((p_test > 0.5) == Y_test)/X_test.shape[0]
+                self.test_accuracy = np.sum((p_test > 0.5) == Y_test)/X_test.shape[0]
 
                 print("Epoch: ", epoch)
-                print("  Cost  | Training: %f, Test: %f" %(train_cost, test_cost))
-                print("Accuracy| Training: %f, Test: %f" %(train_accuracy, test_accuracy))
+                print("  Cost  | Training: %f, Test: %f" %(self.train_cost, self.test_cost))
+                print("Accuracy| Training: %f, Test: %f" %(self.train_accuracy, self.test_accuracy))
                 print("-"*50)
 
 
 if __name__ == '__main__':
 
     logreg = LogReg_Ising()
-    logreg.optimize(m = 1000, regularization='l1', lamb = 0.1)
+    logreg.optimize(m = 1000, eta = 0.001)#, regularization='l1', lamb = 0.1)

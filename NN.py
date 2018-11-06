@@ -156,15 +156,16 @@ class NeuralNet():
 
         if self.cost_func == 'log':
 
-            #error = self.act_exp[np.arange(self.act_exp.shape[0]),
-            #cost =  0.5/y.shape[0]*(np.log(self.act_exp[y.flatten()]) - self.output[y.flatten()])
-            #return - 1.0/y.shape[0]*np.sum(y*np.log(ypred) + (1-y)*np.log(1 - ypred), axis = 0)
-            return -0.5/y.shape[0]*np.sum(np.log(ypred[np.arange(ypred.shape[0]), y.flatten()]))
+            cost = -0.5/y.shape[0]*np.sum(np.log(ypred[np.arange(ypred.shape[0]), y.flatten()]))
 
         if self.regularization == 'l2':
 
             for key in list(self.Weights.keys()):
                 cost += self.lamb/(2*y.shape[0])*np.sum(Weights[key]**2)
+
+        elif self.regularization == 'l1':
+            for key in list(self.Weights.keys()):
+                cost += self.lamb/(2*y.shape[0])*np.sum(np.abs(Weights[key]))
 
         return cost
 
@@ -226,7 +227,11 @@ class NeuralNet():
             self.Biases_grad['dB'+str(i)] = grad_b
 
             if self.regularization == 'l2':
-                self.Weights['W'+str(i)] -= self.eta*(grad_w +   self.lamb/yTrue.shape[0]*self.Weights['W'+str(i)])
+                self.Weights['W'+str(i)] -= self.eta*(grad_w + self.lamb/yTrue.shape[0]*self.Weights['W'+str(i)])
+
+            elif self.regularization == 'l1':
+                self.Weights['W'+str(i)] -= self.eta*(grad_w + self.lamb/yTrue.shape[0]*np.sign(self.Weights['W'+str(i)]))
+
             else:
                 self.Weights['W'+str(i)] -= self.eta*grad_w
 
@@ -234,9 +239,13 @@ class NeuralNet():
 
 
 
-    def TrainNN(self, epochs = 300000, batchSize = 200, eta = 0.01, n_print = 100):
+    def TrainNN(self, epochs = 1000, batchSize = 200, eta0 = 0.01, n_print = 100):
 
-        self.eta = eta
+        if eta0 == 'schedule':
+            t0 = 5 ; t1 = 50
+            eta = lambda t : t0/(t + t1)
+        else:
+            eta = lambda t : eta0
 
         num_batch = int(self.nTrain/batchSize)
 
@@ -245,6 +254,8 @@ class NeuralNet():
             indices = np.random.choice(self.nTrain, self.nTrain, replace=False)
 
             for b in range(num_batch):
+
+                self.eta = eta(epoch*num_batch+b)
 
                 batch = indices[b*batchSize:(b+1)*batchSize]
                 xBatch = self.xTrain[batch]
@@ -255,8 +266,6 @@ class NeuralNet():
 
             if epoch == 0 or epoch % n_print == 0:
 
-                #trainError = 1.0/self.nTrain*np.sum((self.yTrain - self.feed_forward(self.xTrain, isTraining=False))**2)
-                #testError =  1.0/self.nTest*np.sum((self.yTest - self.feed_forward(self.xTest, isTraining=False))**2)
                 ypred_train = self.feed_forward(self.xTrain, isTraining=False)
                 ypred_test = self.feed_forward(self.xTest, isTraining=False)
                 trainError = self.cost_function(self.yTrain, ypred_train)
