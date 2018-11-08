@@ -94,6 +94,9 @@ class NeuralNet():
 
             self.Weights['W'+str(i+1)] = np.random.uniform(-0.1, 0.1, (self.nodes[i], self.nodes[i+1]))
             self.Biases['B'+str(i+1)] = np.random.uniform(-0.1, 0.1, self.nodes[i+1])
+            # r = np.sqrt(6/(self.nodes[i] +self.nodes[i+1]))
+            # self.Weights['W'+str(i+1)] = np.random.uniform(-r, r, (self.nodes[i], self.nodes[i+1]))
+            # self.Biases['B'+str(i+1)] = np.random.uniform(-r, r, self.nodes[i+1])
 
             self.Weights_grad['dW'+str(i+1)] = np.zeros_like(self.Weights['W'+str(i+1)])
             self.Biases_grad['dB'+str(i+1)] = np.zeros_like(self.Biases['B'+str(i+1)])
@@ -161,11 +164,13 @@ class NeuralNet():
         if self.regularization == 'l2':
 
             for key in list(self.Weights.keys()):
-                cost += self.lamb/(2*y.shape[0])*np.sum(Weights[key]**2)
+                # cost += self.lamb/(2*y.shape[0])*np.sum(self.Weights[key]**2)
+                cost += self.lamb/(2)*np.sum(self.Weights[key]**2)
 
         elif self.regularization == 'l1':
             for key in list(self.Weights.keys()):
-                cost += self.lamb/(2*y.shape[0])*np.sum(np.abs(Weights[key]))
+                # cost += self.lamb/(2*y.shape[0])*np.sum(np.abs(self.Weights[key]))
+                cost += self.lamb/(2)*np.sum(np.abs(self.Weights[key]))
 
         return cost
 
@@ -227,10 +232,10 @@ class NeuralNet():
             self.Biases_grad['dB'+str(i)] = grad_b
 
             if self.regularization == 'l2':
-                self.Weights['W'+str(i)] -= self.eta*(grad_w + self.lamb/yTrue.shape[0]*self.Weights['W'+str(i)])
+                self.Weights['W'+str(i)] -= self.eta*(grad_w + self.lamb*self.Weights['W'+str(i)])
 
             elif self.regularization == 'l1':
-                self.Weights['W'+str(i)] -= self.eta*(grad_w + self.lamb/yTrue.shape[0]*np.sign(self.Weights['W'+str(i)]))
+                self.Weights['W'+str(i)] -= self.eta*(grad_w + self.lamb*np.sign(self.Weights['W'+str(i)]))
 
             else:
                 self.Weights['W'+str(i)] -= self.eta*grad_w
