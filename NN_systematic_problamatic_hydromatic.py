@@ -113,7 +113,7 @@ def plot_regularization():
         for j, name in enumerate(datasetnames):
             errax.set_xlabel(r'$\lambda$')
             errax.set_ylabel('Error')
-            errax.semilogx(lambs, errors[str(key)][str(name)], 
+            errax.semilogx(lambs[:-1], errors[str(key)][str(name)][:-1], 
                     color=colors[i], linestyle=linestyles[j], label=str(key).capitalize()+'_'+str(name))
             errax.legend()
 
