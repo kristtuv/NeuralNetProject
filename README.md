@@ -1,4 +1,4 @@
-# Linear Regression analysis       
+# Ising Model Analysis using linear regregreesion and neural networks
 Project doing linear regression, logistic regression and binary classification using a simple neural network on data from the 1D and 2D Ising model    
 ## Build with    
 scikit-image    0.13.1      
