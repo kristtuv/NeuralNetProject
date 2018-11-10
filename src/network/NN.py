@@ -275,10 +275,10 @@ class NeuralNet():
                 ypred_test = self.feed_forward(self.xTest, isTraining=False)
                 trainError = self.cost_function(self.yTrain, ypred_train)
                 testError = self.cost_function(self.yTest, ypred_test)
-                print("Error after %i epochs, Training:  %g, Test:  %g" %(epoch, trainError,testError))
+                # print("Error after %i epochs, Training:  %g, Test:  %g" %(epoch, trainError,testError))
 
                 if self.cost_func == 'log':
                     trainAcc = self.accuracy(self.yTrain, ypred_train)
                     testAcc = self.accuracy(self.yTest, ypred_test)
-                    print("Accuracy after %i epochs, Training:   %g %%, Test:   %g %%\n" %(epoch, trainAcc, testAcc))
+                    # print("Accuracy after %i epochs, Training:   %g %%, Test:   %g %%\n" %(epoch, trainAcc, testAcc))
                     #print("-"*75)

@@ -1,4 +1,13 @@
+"""Calculates accuracy and cost of 
+training, test and critiacal set
+run on all the data available in 
+network/fetch_2D_data"""
+
 import numpy as np
+import sys
+sys.append('network')
+sys.append('../')
+sys.append('../../')
 from fetch_2D_data import fetch_data
 from NN import NeuralNet
 

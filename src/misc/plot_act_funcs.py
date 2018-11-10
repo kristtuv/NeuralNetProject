@@ -1,4 +1,8 @@
 import numpy as np
+import sys
+sys.append('network')
+sys.append('../')
+sys.append('../../')
 import matplotlib.pylab as plt
 import plotparams
 
