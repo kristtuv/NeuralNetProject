@@ -22,8 +22,72 @@ from fetch_2D_data import fetch_data
 from NN import NeuralNet
 from sklearn.utils import shuffle
 import pandas as pd
+from time import time
+def plot_convergence():
+    #######################################################
+    ###############Defining parameters#####################
+    #######################################################
+    best_architectures = [['tanh', None], ['tanh', None], ['tanh', None],
+            ['tanh','tanh', None], ['tanh', 'tanh', 'tanh', None],
+            ['sigmoid', 'sigmoid', None]]
+    nodes = [[X.shape[1], 100, 2], [X.shape[1], 50, 2], [X.shape[1], 10, 2], 
+            [X.shape[1], 100, 100, 2], [X.shape[1], 100, 100, 100 2], 
+            [X.shape[1], 100, 100, 2]]
 
 
+
+
+    regularizations = ['l2', 'l2', 'l2', 'l2', 'l1', None]
+    lambdas = [0.1, 0.1, 0.1, 0.1, 0.001, 0.01]
+    n_samples = [10000]
+
+    df = pd.DataFrame()
+
+    ########################################################
+    ################Fetching Data###########################
+    ########################################################
+    X, Y, X_critical, Y_critical = fetch_data()
+    X, Y = shuffle(X, Y)
+    X_critical, Y_critical = shuffle(X_critical, Y_critical)
+
+    for sample in n_samples:
+        X_train = X[:sample]; Y_train = Y[:sample]
+        X_test = X[sample:2*sample]; Y_test = Y[sample:2*sample]
+        X_crit = X_critical[:sample]; Y_crit = Y_critical[:sample]
+        for activation, lamb, node, reg in zip(best_architectures, lambdas, nodes, regularizations):
+            start = time.time()
+            nn = NeuralNet( 
+                        X_train, 
+                        Y_train, 
+                        nodes = node, 
+                        activations = activation,
+                        cost_func='log',
+                        regularization=reg,
+                        lamb=lamb)
+            nn.TrainNN(epochs = 100)
+            
+            stop = time.time()
+
+            walltime = (stop - start)
+            ypred_train = nn.feed_forward(X_train, isTraining=False)
+            ypred_test = nn.feed_forward(X_test, isTraining=False)
+            ypred_crit = nn.feed_forward(X_crit, isTraining=False)
+                                                                                         
+            df = df.append({
+                    'Sample size': sample,
+                    'Lambda': lamb,
+                    'Regularization': reg,
+                    'Nodes': node[0]
+                    'Activation': (len(activation)-1)*activation[0],
+                    'Train error': nn.cost_function(Y_train, ypred_train),
+                    'Test error':  nn.cost_function(Y_test, ypred_test),
+                    'Critical error': nn.cost_function(Y_crit, ypred_crit),
+                    'Train accuracy':nn.accuracy(Y_train, ypred_train),
+                    'Test accuracy': nn.accuracy(Y_test, ypred_test),
+                    'Critical accuracy': nn.accuracy(Y_crit, ypred_crit),
+                    'Walltime': walltime
+                    }, ignore_index=True)
+            
 def best_architecture():
 
     #######################################################
