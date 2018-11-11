@@ -14,9 +14,9 @@ values of lambda.
 
 import numpy as np
 import sys
-sys.append('network')
-sys.append('../')
-sys.append('../../')
+sys.path.append('network')
+sys.path.append('../')
+sys.path.append('../../')
 import matplotlib.pyplot as plt
 from fetch_2D_data import fetch_data
 from NN import NeuralNet
@@ -31,10 +31,8 @@ def plot_convergence():
             ['tanh','tanh', None], ['tanh', 'tanh', 'tanh', None],
             ['sigmoid', 'sigmoid', None]]
     nodes = [[X.shape[1], 100, 2], [X.shape[1], 50, 2], [X.shape[1], 10, 2], 
-            [X.shape[1], 100, 100, 2], [X.shape[1], 100, 100, 100 2], 
+            [X.shape[1], 100, 100, 2], [X.shape[1], 100, 100, 100, 2], 
             [X.shape[1], 100, 100, 2]]
-
-
 
 
     regularizations = ['l2', 'l2', 'l2', 'l2', 'l1', None]
@@ -55,7 +53,6 @@ def plot_convergence():
         X_test = X[sample:2*sample]; Y_test = Y[sample:2*sample]
         X_crit = X_critical[:sample]; Y_crit = Y_critical[:sample]
         for activation, lamb, node, reg in zip(best_architectures, lambdas, nodes, regularizations):
-            start = time.time()
             nn = NeuralNet( 
                         X_train, 
                         Y_train, 
@@ -64,29 +61,33 @@ def plot_convergence():
                         cost_func='log',
                         regularization=reg,
                         lamb=lamb)
-            nn.TrainNN(epochs = 100)
-            
-            stop = time.time()
 
+            start = time.time()
+            nn.TrainNN(epochs = 100)
+            stop = time.time()
+            convergence = nn.convergence_rate 
             walltime = (stop - start)
-            ypred_train = nn.feed_forward(X_train, isTraining=False)
-            ypred_test = nn.feed_forward(X_test, isTraining=False)
-            ypred_crit = nn.feed_forward(X_crit, isTraining=False)
+            print(walltime)
+            plt.plot(convergence['Epoch'], convergence['Test Accuracy'])
+            plt.show()
+            # ypred_train = nn.feed_forward(X_train, isTraining=False)
+            # ypred_test = nn.feed_forward(X_test, isTraining=False)
+            # ypred_crit = nn.feed_forward(X_crit, isTraining=False)
                                                                                          
-            df = df.append({
-                    'Sample size': sample,
-                    'Lambda': lamb,
-                    'Regularization': reg,
-                    'Nodes': node[0]
-                    'Activation': (len(activation)-1)*activation[0],
-                    'Train error': nn.cost_function(Y_train, ypred_train),
-                    'Test error':  nn.cost_function(Y_test, ypred_test),
-                    'Critical error': nn.cost_function(Y_crit, ypred_crit),
-                    'Train accuracy':nn.accuracy(Y_train, ypred_train),
-                    'Test accuracy': nn.accuracy(Y_test, ypred_test),
-                    'Critical accuracy': nn.accuracy(Y_crit, ypred_crit),
-                    'Walltime': walltime
-                    }, ignore_index=True)
+            # df = df.append({
+            #         'Sample size': sample,
+            #         'Lambda': lamb,
+            #         'Regularization': reg,
+            #         'Nodes': node[0]
+            #         'Activation': (len(activation)-1)*activation[0],
+            #         'Train error': nn.cost_function(Y_train, ypred_train),
+            #         'Test error':  nn.cost_function(Y_test, ypred_test),
+            #         'Critical error': nn.cost_function(Y_crit, ypred_crit),
+            #         'Train accuracy':nn.accuracy(Y_train, ypred_train),
+            #         'Test accuracy': nn.accuracy(Y_test, ypred_test),
+            #         'Critical accuracy': nn.accuracy(Y_crit, ypred_crit),
+            #         'Walltime': walltime
+            #         }, ignore_index=True)
             
 def best_architecture():
 
@@ -310,5 +311,6 @@ def plot_regularization():
 
 
 if __name__=='__main__':
-    best_architecture()
-    plot_regularization()
+    # best_architecture()
+    # plot_regularization()
+    plot_convergence()

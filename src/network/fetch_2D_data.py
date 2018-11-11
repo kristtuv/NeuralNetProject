@@ -2,9 +2,9 @@ import numpy as np
 import pickle,os
 from sklearn.model_selection import train_test_split
 import sys
-sys.append('network')
-sys.append('../')
-sys.append('../../')
+sys.path.append('network')
+sys.path.append('../')
+sys.path.append('../../')
 def fetch_data(ordered_stop=70000, disordered_start=100000, crit=True):
 
     # load data

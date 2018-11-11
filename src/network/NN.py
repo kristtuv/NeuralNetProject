@@ -251,7 +251,8 @@ class NeuralNet():
             eta = lambda t : eta0
 
         num_batch = int(self.nTrain/batchSize)
-
+        
+        self.convergence_rate = {'Epoch': [], 'Test Accuracy': []}
         for epoch in range(epochs +1):
 
             indices = np.random.choice(self.nTrain, self.nTrain, replace=False)
@@ -273,10 +274,12 @@ class NeuralNet():
                 ypred_test = self.feed_forward(self.xTest, isTraining=False)
                 trainError = self.cost_function(self.yTrain, ypred_train)
                 testError = self.cost_function(self.yTest, ypred_test)
-                # print("Error after %i epochs, Training:  %g, Test:  %g" %(epoch, trainError,testError))
+                print("Error after %i epochs, Training:  %g, Test:  %g" %(epoch, trainError,testError))
 
                 if self.cost_func == 'log':
                     trainAcc = self.accuracy(self.yTrain, ypred_train)
                     testAcc = self.accuracy(self.yTest, ypred_test)
-                    # print("Accuracy after %i epochs, Training:   %g %%, Test:   %g %%\n" %(epoch, trainAcc, testAcc))
+                    print("Accuracy after %i epochs, Training:   %g %%, Test:   %g %%\n" %(epoch, trainAcc, testAcc))
+                    self.convergence_rate['Epoch'].append(epoch)
+                    self.convergence_rate['Test Accuracy'].append(testAcc)
                     #print("-"*75)

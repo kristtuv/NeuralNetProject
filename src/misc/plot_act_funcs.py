@@ -1,8 +1,8 @@
 import numpy as np
 import sys
-sys.append('network')
-sys.append('../')
-sys.append('../../')
+sys.path.append('network')
+sys.path.append('../')
+sys.path.append('../../')
 import matplotlib.pylab as plt
 import plotparams
 
