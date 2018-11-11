@@ -53,8 +53,10 @@ def plot_convergence():
     lambdas = [0.1, 0.1, 0.1, 0.1, 0.001, 0.01]
 
     df = pd.DataFrame()
-
+    convergence_dict = {}
+    i = 0
     for activation, lamb, node, reg in zip(best_architectures, lambdas, nodes, regularizations):
+        
         nn = NeuralNet( 
                     X_train, 
                     Y_train, 
@@ -69,28 +71,17 @@ def plot_convergence():
         stop = time()
         convergence = nn.convergence_rate 
         walltime = (stop - start)
-        print(walltime)
-        plt.plot(convergence['Epoch'], convergence['Test Accuracy'])
-        plt.show()
-        # ypred_train = nn.feed_forward(X_train, isTraining=False)
-        # ypred_test = nn.feed_forward(X_test, isTraining=False)
-        # ypred_crit = nn.feed_forward(X_crit, isTraining=False)
-                                                                                     
-        # df = df.append({
-        #         'Sample size': sample,
-        #         'Lambda': lamb,
-        #         'Regularization': reg,
-        #         'Nodes': node[0]
-        #         'Activation': (len(activation)-1)*activation[0],
-        #         'Train error': nn.cost_function(Y_train, ypred_train),
-        #         'Test error':  nn.cost_function(Y_test, ypred_test),
-        #         'Critical error': nn.cost_function(Y_crit, ypred_crit),
-        #         'Train accuracy':nn.accuracy(Y_train, ypred_train),
-        #         'Test accuracy': nn.accuracy(Y_test, ypred_test),
-        #         'Critical accuracy': nn.accuracy(Y_crit, ypred_crit),
-        #         'Walltime': walltime
-        #         }, ignore_index=True)
-        
+        convergence_dict[activation[0]*(len(activation)-1)+str(node[1])] = convergence['Test Accuracy']
+        i += 1   
+
+    fig, ax = plt.subplots()
+    for key in convergence_dict:
+        ax.plot(np.arange(101), convergence_dict[key], label=key)
+    ax.set_xlabel('Epochs')
+    ax.set_ylabel('Accuracy')
+    plt.legend()
+    plt.savefig('../plots/convergence_rate.png')
+    plt.show()
 def best_architecture():
 
     #######################################################
@@ -102,17 +93,6 @@ def best_architecture():
     regularizations = [None]
     n_samples = [10, 20]
     activation_functions = [['relu', None]]
-
-    # nodes=[5, 10, 20, 30, 50]
-    # regularizations = [None, 'l1', 'l2']
-    # n_samples = [5000]
-
-    # activation_functions = []
-    # acts = ['relu', 'sigmoid', 'tanh']
-    # for i in range(1, 4):
-    #     for j in acts:
-    #         activation_functions.append([j]*i + [None])
-
 
     df = pd.DataFrame()
 
