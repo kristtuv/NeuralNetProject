@@ -1,9 +1,9 @@
 """
 A brute force program for testing different architectures
-in neural networks. 
+in neural networks.
 
 Best_architecture writes to csv files a list of sorted
-architectures by critical accuracy. Remember to change 
+architectures by critical accuracy. Remember to change
 the name of csv file, as it will overwrite the previous one.
 Change values under 'Defining parameters'
 to change type of architecture.
@@ -44,8 +44,8 @@ def plot_convergence():
     best_architectures = [['tanh', None], ['tanh', None], ['tanh', None],
             ['tanh','tanh', None], ['tanh', 'tanh', 'tanh', None],
             ['sigmoid', 'sigmoid', None]]
-    nodes = [[X.shape[1], 100, 2], [X.shape[1], 50, 2], [X.shape[1], 10, 2], 
-            [X.shape[1], 100, 100, 2], [X.shape[1], 100, 100, 100, 2], 
+    nodes = [[X.shape[1], 100, 2], [X.shape[1], 50, 2], [X.shape[1], 10, 2],
+            [X.shape[1], 100, 100, 2], [X.shape[1], 100, 100, 100, 2],
             [X.shape[1], 100, 100, 2]]
 
 
@@ -54,14 +54,14 @@ def plot_convergence():
 
     df = pd.DataFrame()
     convergence_dict = {}
-    walltime_list = [] 
+    walltime_list = []
     i = 0
     for activation, lamb, node, reg in zip(best_architectures, lambdas, nodes, regularizations):
-        
-        nn = NeuralNet( 
-                    X_train, 
-                    Y_train, 
-                    nodes = node, 
+
+        nn = NeuralNet(
+                    X_train,
+                    Y_train,
+                    nodes = node,
                     activations = activation,
                     cost_func='log',
                     regularization=reg,
@@ -70,11 +70,11 @@ def plot_convergence():
         start = time()
         nn.TrainNN(epochs = 100, n_print=1)
         stop = time()
-        convergence = nn.convergence_rate 
+        convergence = nn.convergence_rate
         walltime = (stop - start)
         convergence_dict[activation[0]*(len(activation)-1)+str(node[1])] = convergence['Test Accuracy']
         walltime_list.append(walltime)
-        i += 1  
+        i += 1
     fig, ax = plt.subplots()
     for key in convergence_dict:
         ax.plot(np.arange(101), convergence_dict[key], label=key)
@@ -86,8 +86,8 @@ def plot_convergence():
     figb, bx = plt.subplots()
     names = list(convergence_dict.keys())
     bx.bar(np.arange(len(walltime_list)), walltime_list, tick_label=names)
-    bx.set_ylabel('Walltime')
-    bx.tick_params(rotation=-20)
+    bx.set_ylabel('Walltime [s]')
+    plt.xticks(rotation=-20)
     plt.savefig('../plots/walltime.png')
     plt.tight_layout()
     plt.show()
@@ -128,10 +128,10 @@ def best_architecture():
                     print(node)
                     for lamb in lambdas:
                         print(lamb)
-                        nn = NeuralNet( 
-                                    X_train, 
-                                    Y_train, 
-                                    nodes = node, 
+                        nn = NeuralNet(
+                                    X_train,
+                                    Y_train,
+                                    nodes = node,
                                     activations = activation,
                                     cost_func='log',
                                     regularization=reg,
@@ -141,7 +141,7 @@ def best_architecture():
                         ypred_train = nn.feed_forward(X_train, isTraining=False)
                         ypred_test = nn.feed_forward(X_test, isTraining=False)
                         ypred_crit = nn.feed_forward(X_crit, isTraining=False)
-                                                                                                     
+
                         df = df.append({
                                 'Sample size': sample,
                                 'Lambda': lamb,
@@ -156,7 +156,7 @@ def best_architecture():
                                 'Critical accuracy': nn.accuracy(Y_crit, ypred_crit)
                                 }, ignore_index=True)
     df.to_csv('best_architecture.csv', index_label='Index')
-        
+
 
 def plot_regularization():
 
