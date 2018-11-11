@@ -27,7 +27,7 @@ def plot_convergence():
     ########################################################
     ################Fetching Data###########################
     ########################################################
-    sample = 100
+    sample = 10000
     X, Y, X_critical, Y_critical = fetch_data()
     X, Y = shuffle(X, Y)
     X_critical, Y_critical = shuffle(X_critical, Y_critical)
@@ -54,6 +54,7 @@ def plot_convergence():
 
     df = pd.DataFrame()
     convergence_dict = {}
+    walltime_list = [] 
     i = 0
     for activation, lamb, node, reg in zip(best_architectures, lambdas, nodes, regularizations):
         
@@ -72,15 +73,23 @@ def plot_convergence():
         convergence = nn.convergence_rate 
         walltime = (stop - start)
         convergence_dict[activation[0]*(len(activation)-1)+str(node[1])] = convergence['Test Accuracy']
-        i += 1   
-
+        walltime_list.append(walltime)
+        i += 1  
     fig, ax = plt.subplots()
     for key in convergence_dict:
         ax.plot(np.arange(101), convergence_dict[key], label=key)
     ax.set_xlabel('Epochs')
     ax.set_ylabel('Accuracy')
     plt.legend()
-    plt.savefig('../plots/convergence_rate.png')
+    # plt.savefig('../plots/convergence_rate.png')
+
+    figb, bx = plt.subplots()
+    names = list(convergence_dict.keys())
+    bx.bar(np.arange(len(walltime_list)), walltime_list, tick_label=names)
+    bx.set_ylabel('Walltime')
+    bx.tick_params(rotation=-20)
+    plt.savefig('../plots/walltime.png')
+    plt.tight_layout()
     plt.show()
 def best_architecture():
 
