@@ -330,7 +330,18 @@ ssssssssssss        elif act_func == 'relu':
 
     def TrainNN(self, epochs = 1000, batchSize = 200, eta0 = 0.01, n_print = 100):
         """
+        Training the network using forward and backward propagation.
 
+        param: epochs: Number of iterations through the entire data set
+        type: epochs: int
+        param: batchSize: Batch size. Must be between one and the size of the
+        full data set
+        type: batchSize: int
+        param: eta0: learning rate or 'schedule'
+        type: eta0: float, string
+        param: n_print: how often we print accuracy and error to the terminal
+        type: n_print: int
+        return: None
         """
 
         if eta0 == 'schedule':

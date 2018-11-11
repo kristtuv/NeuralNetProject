@@ -25,7 +25,7 @@ class LogReg_Ising():
 
         # load data
         file_name = "IsingData/Ising2DFM_reSample_L40_T=All.pkl" # this file contains 16*10000 samples taken in T=np.arange(0.25,4.0001,0.25)
-        data = pickle.load(open(file_name,'rb')) # pickle reads the file and returns the Python object (1D array, compressed bits)
+        datad = pickle.load(open(file_name,'rb')) # pickle reads the file and returns the Python object (1D array, compressed bits)
         data = np.unpackbits(data).reshape(-1, 1600) # Decompress array and reshape for convenience
         data=data.astype('int')
         data[np.where(data==0)]=-1 # map 0 state to -1 (Ising variable can take values +/-1)
@@ -83,6 +83,21 @@ class LogReg_Ising():
         eta = 'schedule',
         regularization=None,
         lamb = 0.0):
+
+        """
+        param: method: What type of gradient descent optimiser
+        param: m: Iterations within one epoch 
+        param: epochs: Number of full iterations through data set
+        param: eta: Learing rate
+        param: regularization: Type of regularization
+        param: lamb: Regularization strength
+        type: method: string
+        type: m: int
+        type: epochs: int
+        type: eta: string
+        type: regularization: string
+        type: lamb: float
+        """
 
         X_train = self.X_train ; X_test = self.X_test
         Y_train = self.Y_train ; Y_test = self.Y_test
