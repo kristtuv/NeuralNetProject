@@ -1,3 +1,7 @@
+import sys
+sys.path.append('network')
+sys.path.append('../')
+sys.path.append('../../')
 import numpy as np
 from fetch_2D_data import fetch_data
 from NN import NeuralNet

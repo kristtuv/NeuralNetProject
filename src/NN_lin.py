@@ -1,8 +1,11 @@
 import numpy as np
+import sys
+sys.path.append('network')
+sys.path.append('../')
+sys.path.append('../../')
 import matplotlib.pylab as plt
 from NN import NeuralNet
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-
 ### define Ising model params
 # system size
 L = 40
