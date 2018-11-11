@@ -13,11 +13,29 @@ class NeuralNet():
         cost_func='mse',
         regularization=None,
         lamb = 0.0):
+        
+         
         """
-        Data x
-        data y
-        arcitecture = nodes and type of activation in each node
-
+        param: xData: Data for training and testing 
+        param: yData: Reference data for evaluating the model 
+        param: nodes: Nodes in each layer. First element should
+        be the size of one training example and last element depends
+        on what kind of output we want. I.e for regression we have 1
+        node and for classification we can have several.
+        param: activations: activations in the hidden layers of your model.
+        There is no activation in the input layer, and the size of activaion
+        should be the size of nodes-1. The activation in the output layer
+        is normally set to None.
+        param: cost_func: Type of cost function to use
+        param: regularization: type of regularization
+        param: lamb: strength of regularization
+        type: xData: ndarray
+        type: yData: ndarray
+        type: nodes: list
+        type: activation: list
+        type: cost_func: string
+        type: regularization: string
+        type: lamb: float
         """
         self.xData = xData
         self.yData = yData
@@ -85,6 +103,10 @@ class NeuralNet():
             self.nTrain = xTrain.shape[0] ; self.nTest = xTest.shape[0]
 
     def initialize_weights_biases(self):
+        """
+        Initializes weights and biases for all layers
+        return: None
+        """
 
         self.Weights = {} ; self.Biases = {}
         self.Weights_grad = {} ; self.Biases_grad = {}
@@ -94,15 +116,23 @@ class NeuralNet():
 
             self.Weights['W'+str(i+1)] = np.random.uniform(-0.1, 0.1, (self.nodes[i], self.nodes[i+1]))
             self.Biases['B'+str(i+1)] = np.random.uniform(-0.1, 0.1, self.nodes[i+1])
-            # r = np.sqrt(6/(self.nodes[i] +self.nodes[i+1]))
-            # self.Weights['W'+str(i+1)] = np.random.uniform(-r, r, (self.nodes[i], self.nodes[i+1]))
-            # self.Biases['B'+str(i+1)] = np.random.uniform(-r, r, self.nodes[i+1])
 
             self.Weights_grad['dW'+str(i+1)] = np.zeros_like(self.Weights['W'+str(i+1)])
             self.Biases_grad['dB'+str(i+1)] = np.zeros_like(self.Biases['B'+str(i+1)])
 
 
     def activation(self, x, act_func):
+         """
+        Calculation of the selected
+        activation function
+
+        param: x: data 
+        type: x: ndarray
+        param: act_func: activaion function given in init
+        type: act_func: string 
+        return: selected activation
+        """
+
 
         if act_func == 'sigmoid':
 
@@ -110,12 +140,12 @@ class NeuralNet():
 
         elif act_func == 'tanh':
 
-            return np.tanh(x)
-
+ sssssssssssssssssssssss           return np.tanh(x)
+s
         elif act_func == 'relu':
 
             return x * (x >= 0)
-
+s
         elif act_func == None:
             return x
 
@@ -124,16 +154,26 @@ class NeuralNet():
             sys.exit(0)
 
     def activation_derivative(self, x, act_func):
+         """
+        Calculation of derivative of the selected
+        activation function
+
+        param: x: data 
+        type: x: ndarray
+        param: act_func: activaion function given in init
+        type: act_func: string 
+        return: derivative of activation function
+        """
 
         if act_func == 'sigmoid':
 
             return x*(1 - x)
 
-        elif act_func == 'tanh':
+        elifs act_func == 'tanh':
 
             return 1 - x**2
 
-        elif act_func == 'relu':
+ssssssssssss        elif act_func == 'relu':
 
             return 1*(x >= 0)
 
@@ -144,7 +184,13 @@ class NeuralNet():
             sys.exit(0)
 
     def softmax(self, act):
+        """
+        calculates the softmax function
 
+        param: act:
+        type: act:
+        return: softmax function
+        """
         # Subtraction of max value for numerical stability
         act_exp = np.exp(act - np.max(act))
         self.act_exp = act_exp
@@ -152,17 +198,24 @@ class NeuralNet():
         return act_exp/np.sum(act_exp, axis=1, keepdims=True)
 
     def cost_function(self, y, ypred):
+        """
+        Using the cost function defined
+        in init
+
+        param: y: correct labels
+        type: y: ndarray
+        param: y_pred: predicted labels
+        type: y_pred: ndarray 
+        return: selected cost function
+        """
 
         if self.cost_func == 'mse':
-
             cost =  0.5/y.shape[0]*np.sum((y - ypred)**2)
 
         if self.cost_func == 'log':
-
             cost = -0.5/y.shape[0]*np.sum(np.log(ypred[np.arange(ypred.shape[0]), y.flatten()]))
 
         if self.regularization == 'l2':
-
             for key in list(self.Weights.keys()):
                 cost += self.lamb/2*np.sum(self.Weights[key]**2)
 
@@ -174,6 +227,15 @@ class NeuralNet():
 
 
     def cost_function_derivative(self, y, ypred):
+       """
+        Takes the derivative of the selected cost function
+
+        param: y: correct labels
+        type: y: ndarray
+        param: y_pred: predicted labels
+        type: y_pred: ndarray 
+        return: costfunction derivative
+        """
 
         if self.cost_func == 'mse':
             return -1.0/y.shape[0]*(y - ypred)
@@ -183,12 +245,30 @@ class NeuralNet():
             return 1.0/y.shape[0]*ypred
 
     def accuracy(self, y, ypred):
-
+        """
+        Measures the number of correctly 
+        classified classes 
+        param: y: correct labels
+        type: y: ndarray
+        param: y_pred: predicted labels
+        type: y_pred: ndarray 
+        return: accuracy
+        """
         cls_pred = np.argmax(ypred, axis=1)
         return 100.0/y.shape[0]*np.sum(cls_pred == y)
 
 
     def feed_forward(self, x, isTraining = True):
+        """
+        Doing the forward propagation
+        
+        param: x: Data
+        type: x: ndarray
+        param: isTraining: Set to false if using a finished
+        model for predicting on new data.
+        type: isTraining: bool
+        return: activation values
+        """
 
         self.A['A0'] = x
         for i in range(self.nLayers):
@@ -211,7 +291,13 @@ class NeuralNet():
 
 
     def backpropagation(self, yTrue = None):
+        """
+        Function for doing the backpropagation
 
+        param: yTrue:
+        type: yTrue:
+        return: None
+        """
         if yTrue is None:
             yTrue = self.yTrain
 
@@ -243,6 +329,9 @@ class NeuralNet():
 
 
     def TrainNN(self, epochs = 1000, batchSize = 200, eta0 = 0.01, n_print = 100):
+        """
+
+        """
 
         if eta0 == 'schedule':
             t0 = 5 ; t1 = 50

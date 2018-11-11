@@ -15,6 +15,11 @@ class LogReg_Ising():
         self.J = np.random.uniform(-0.5, 0.5, (self.X_train.shape[1],1))
 
     def fetch_data(self):
+        """
+        Fetchin the 2 dimensional ising data
+        and spliting it into ordered, disordered and critical
+        data
+        """
 
         train_to_test_ratio=0.5 # training samples
 
