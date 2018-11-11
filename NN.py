@@ -36,7 +36,7 @@ class NeuralNet():
         self.activations = activations
         self.nLayers = len(activations)
 
-        self.split_data(folds = 10, frac = 0.3)
+        self.split_data(folds = 10, frac = 0.3, shuffle=True)
         self.initialize_weights_biases()
 
     def split_data(self, folds = None, frac = None, shuffle = False):
@@ -161,11 +161,11 @@ class NeuralNet():
         if self.regularization == 'l2':
 
             for key in list(self.Weights.keys()):
-                cost += self.lamb/(2*y.shape[0])*np.sum(Weights[key]**2)
+                cost += self.lamb/2*np.sum(self.Weights[key]**2)
 
         elif self.regularization == 'l1':
             for key in list(self.Weights.keys()):
-                cost += self.lamb/(2*y.shape[0])*np.sum(np.abs(Weights[key]))
+                cost += self.lamb/2*np.sum(np.abs(self.Weights[key]))
 
         return cost
 
@@ -227,10 +227,10 @@ class NeuralNet():
             self.Biases_grad['dB'+str(i)] = grad_b
 
             if self.regularization == 'l2':
-                self.Weights['W'+str(i)] -= self.eta*(grad_w + self.lamb/yTrue.shape[0]*self.Weights['W'+str(i)])
+                self.Weights['W'+str(i)] -= self.eta*(grad_w + self.lamb*self.Weights['W'+str(i)])
 
             elif self.regularization == 'l1':
-                self.Weights['W'+str(i)] -= self.eta*(grad_w + self.lamb/yTrue.shape[0]*np.sign(self.Weights['W'+str(i)]))
+                self.Weights['W'+str(i)] -= self.eta*(grad_w + self.lamb*np.sign(self.Weights['W'+str(i)]))
 
             else:
                 self.Weights['W'+str(i)] -= self.eta*grad_w

@@ -43,6 +43,8 @@ class LogReg_Ising():
         # define training and test data sets
         X=np.concatenate((X_ordered,X_disordered))
         Y=np.concatenate((Y_ordered,Y_disordered))
+        self.X_critical = np.c_[np.ones(X_critical.shape[0]), X_critical]
+        self.Y_critical = Y_critical
 
         # pick random data points from ordered and disordered states
         # to create the training and test sets
@@ -118,21 +120,22 @@ class LogReg_Ising():
                 yBatch = Y_train[rand_idx*batchSize : (rand_idx+1)*batchSize]
 
                 y = xBatch @ J
-                p = np.exp(y)/(1 + np.exp(y))
+                #p = np.exp(y)/(1 + np.exp(y))
+                p = 1.0/(1 + np.exp(-y))
                 eta = learning_schedule(epoch*m+i)
-                dJ = -(xBatch.T @ (yBatch - p) - reg_grad(J))/xBatch.shape[0]
+                dJ = -(xBatch.T @ (yBatch - p))/xBatch.shape[0] + reg_grad(J)
                 J -= eta*dJ
 
             if epoch % 10 == 0 or epoch == 0:
 
                 logit_train = X_train @ J
-                self.train_cost = (-np.sum((Y_train * logit_train) - np.log(1 + np.exp(logit_train))) + reg_cost(J))/X_train.shape[0]
-                p_train = np.exp(logit_train)/(1 + np.exp(logit_train))
+                self.train_cost = (-np.sum((Y_train * logit_train) - np.log(1 + np.exp(logit_train))))/X_train.shape[0] + reg_cost(J)
+                p_train = 1/(1 + np.exp(-logit_train))
                 self.train_accuracy = np.sum((p_train > 0.5) == Y_train)/X_train.shape[0]
 
                 logit_test = X_test @ J
-                self.test_cost = (-np.sum((Y_test * logit_test) - np.log(1 + np.exp(logit_test))) + reg_cost(J))/X_test.shape[0]
-                p_test = np.exp(logit_test)/(1 + np.exp(logit_test))
+                self.test_cost = (-np.sum((Y_test * logit_test) - np.log(1 + np.exp(logit_test))))/X_test.shape[0] + reg_cost(J)
+                p_test = 1/(1 + np.exp(-logit_test))
                 self.test_accuracy = np.sum((p_test > 0.5) == Y_test)/X_test.shape[0]
 
                 print("Epoch: ", epoch)
@@ -144,4 +147,4 @@ class LogReg_Ising():
 if __name__ == '__main__':
 
     logreg = LogReg_Ising()
-    logreg.optimize(m = 1000, eta = 0.001)#, regularization='l1', lamb = 0.1)
+    logreg.optimize(m = 1000, regularization='l1', lamb = 100)

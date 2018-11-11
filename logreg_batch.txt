@@ -1,6 +1,6 @@
 LOGREG
 
-Batch size|  L.rate | Train Cost| Test Cost | Train Acc | Test Acc |  Wall Time
+Batch size|  L.rate | Train Cost | Test Cost | Train Acc | Test Acc |  Wall Time
 --------------------------------------------------------------------------------
    65000  |   0.001 |   2.62765  |  2.57877  |  0.642815 | 0.648431 |  105.32
    65000  |    0.01 |   2.56531  |  2.52125  |  0.643677 | 0.648954 | 106.945

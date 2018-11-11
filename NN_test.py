@@ -11,9 +11,10 @@ X, Y, X_crit, Y_crit= fetch_data()
 # nn.TrainNN(epochs = 100, eta = 0.001, n_print=5)
 
 # 100% ACCURACY MADDAFAKKA
-nn = NeuralNet(X,Y, nodes = [X.shape[1], 10, 2], activations = ['sigmoid', None], cost_func='log')
+nn = NeuralNet(X,Y, nodes = [X.shape[1], 100,100,2], activations = ['sigmoid', 'sigmoid',None],\
+                cost_func='log')#, regularization='l2', lamb=0.1)
 nn.split_data(frac=0.5, shuffle=True)
-nn.TrainNN(epochs = 200, eta = 0.01, n_print=5)
+nn.TrainNN(epochs = 200, eta0 = 0.01, n_print=5)
 
 ypred_crit = nn.feed_forward(X_crit, isTraining=False)
 critError = nn.cost_function(Y_crit, ypred_crit)
