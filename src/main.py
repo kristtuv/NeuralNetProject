@@ -1,3 +1,9 @@
+"""Needs description"""
+import sys
+sys.append('network')
+sys.append('../')
+sys.append('../../')
+
 import numpy as np
 import matplotlib.pylab as plt
 from NN import NeuralNet

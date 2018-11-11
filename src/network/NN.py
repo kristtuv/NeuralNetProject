@@ -94,6 +94,9 @@ class NeuralNet():
 
             self.Weights['W'+str(i+1)] = np.random.uniform(-0.1, 0.1, (self.nodes[i], self.nodes[i+1]))
             self.Biases['B'+str(i+1)] = np.random.uniform(-0.1, 0.1, self.nodes[i+1])
+            # r = np.sqrt(6/(self.nodes[i] +self.nodes[i+1]))
+            # self.Weights['W'+str(i+1)] = np.random.uniform(-r, r, (self.nodes[i], self.nodes[i+1]))
+            # self.Biases['B'+str(i+1)] = np.random.uniform(-r, r, self.nodes[i+1])
 
             self.Weights_grad['dW'+str(i+1)] = np.zeros_like(self.Weights['W'+str(i+1)])
             self.Biases_grad['dB'+str(i+1)] = np.zeros_like(self.Biases['B'+str(i+1)])
@@ -270,10 +273,10 @@ class NeuralNet():
                 ypred_test = self.feed_forward(self.xTest, isTraining=False)
                 trainError = self.cost_function(self.yTrain, ypred_train)
                 testError = self.cost_function(self.yTest, ypred_test)
-                print("Error after %i epochs, Training:  %g, Test:  %g" %(epoch, trainError,testError))
+                # print("Error after %i epochs, Training:  %g, Test:  %g" %(epoch, trainError,testError))
 
                 if self.cost_func == 'log':
                     trainAcc = self.accuracy(self.yTrain, ypred_train)
                     testAcc = self.accuracy(self.yTest, ypred_test)
-                    print("Accuracy after %i epochs, Training:   %g %%, Test:   %g %%\n" %(epoch, trainAcc, testAcc))
+                    # print("Accuracy after %i epochs, Training:   %g %%, Test:   %g %%\n" %(epoch, trainAcc, testAcc))
                     #print("-"*75)
