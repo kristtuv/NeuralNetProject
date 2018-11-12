@@ -23,6 +23,10 @@ from sklearn.utils import shuffle
 import pandas as pd
 from time import time
 def plot_convergence():
+    """
+    Ploting the convergence rate of the 6 best models
+    calculated in best_architectures 
+    """
 
     ########################################################
     ################Fetching Data###########################

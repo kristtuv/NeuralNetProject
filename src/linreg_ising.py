@@ -1,5 +1,7 @@
 """
-Needs description
+Program for testing Ordinarey Least Squares,
+Lasso and Ridge regression on one dimensional
+ising data
 """
 import sys
 sys.path.append('network')
@@ -19,7 +21,10 @@ import warnings
 warnings.filterwarnings('ignore')
 
 def stats():
-
+    """
+    Testing all linear regression models for different regularization strengths
+    and calcualting MSE and R2 scores
+    """
     lambdas = np.logspace(-4, 5,10)
     model = LinReg(X, Y)
 
@@ -64,6 +69,9 @@ def stats():
     #plt.show()
 
 def boot_stats():
+    """
+    Bootstrapping and creating bias variace statistics
+    """
 
     lambdas = np.logspace(-4, 5,10)
     model = LinReg(X, Y)
@@ -97,7 +105,9 @@ def boot_stats():
     print("-"*85)
 
 def plot_stuff():
-
+    """
+    PLoting the matrix of the coupling constants
+    """
     model = LinReg(X,Y)
 
     fig, axarr = plt.subplots(nrows=2, ncols=3)
