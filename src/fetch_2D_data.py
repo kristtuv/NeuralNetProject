@@ -2,20 +2,20 @@ import numpy as np
 import pickle,os
 from sklearn.model_selection import train_test_split
 def fetch_data(ordered_stop=70000, disordered_start=100000, crit=True):
-         """
-        Fetchin the 2 dimensional ising data
-        and spliting it into ordered, disordered and critical
-        data. Returns ordered and unordered states as a single matrix.
+    """
+    Fetchin the 2 dimensional ising data
+    and spliting it into ordered, disordered and critical
+    data. Returns ordered and unordered states as a single matrix.
 
-        param: ordered_stop: stop value for the ordered samples
-        param: disordered_start: start value for the disordered samples
-        param: crit: set to True of critical values should be returned
-        type: ordered_stop: int
-        type: disordered_start: int
-        type: crit: bool
-        return: Matrices of training samples X, Y, X_critical and Y_critical
-        or X and Y
-        """
+    param: ordered_stop: stop value for the ordered samples
+    param: disordered_start: start value for the disordered samples
+    param: crit: set to True of critical values should be returned
+    type: ordered_stop: int
+    type: disordered_start: int
+    type: crit: bool
+    return: Matrices of training samples X, Y, X_critical and Y_critical
+    or X and Y
+    """
 
     # load data
     file_name = "IsingData/Ising2DFM_reSample_L40_T=All.pkl" # this file contains 16*10000 samples taken in T=np.arange(0.25,4.0001,0.25)
@@ -42,7 +42,7 @@ def fetch_data(ordered_stop=70000, disordered_start=100000, crit=True):
         Y_critical=labels[ordered_stop:disordered_start]
         del data, labels
         return X, Y, X_critical, Y_critical
-    
+
     else:
         del data,labels
         return X, Y

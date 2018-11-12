@@ -311,6 +311,6 @@ def plot_regularization():
 
 
 if __name__=='__main__':
-    # best_architecture()
-    # plot_regularization()
+    #best_architecture()
+    #plot_regularization()
     plot_convergence()

@@ -13,11 +13,11 @@ class NeuralNet():
         cost_func='mse',
         regularization=None,
         lamb = 0.0):
-        
-         
+
+
         """
-        param: xData: Data for training and testing 
-        param: yData: Reference data for evaluating the model 
+        param: xData: Data for training and testing
+        param: yData: Reference data for evaluating the model
         param: nodes: Nodes in each layer. First element should
         be the size of one training example and last element depends
         on what kind of output we want. I.e for regression we have 1
@@ -122,14 +122,14 @@ class NeuralNet():
 
 
     def activation(self, x, act_func):
-         """
+        """
         Calculation of the selected
         activation function
 
-        param: x: data 
+        param: x: data
         type: x: ndarray
         param: act_func: activaion function given in init
-        type: act_func: string 
+        type: act_func: string
         return: selected activation
         """
 
@@ -140,12 +140,12 @@ class NeuralNet():
 
         elif act_func == 'tanh':
 
- sssssssssssssssssssssss           return np.tanh(x)
-s
+            return np.tanh(x)
+
         elif act_func == 'relu':
 
             return x * (x >= 0)
-s
+
         elif act_func == None:
             return x
 
@@ -154,14 +154,14 @@ s
             sys.exit(0)
 
     def activation_derivative(self, x, act_func):
-         """
+        """
         Calculation of derivative of the selected
         activation function
 
-        param: x: data 
+        param: x: data
         type: x: ndarray
         param: act_func: activaion function given in init
-        type: act_func: string 
+        type: act_func: string
         return: derivative of activation function
         """
 
@@ -169,11 +169,11 @@ s
 
             return x*(1 - x)
 
-        elifs act_func == 'tanh':
+        elif act_func == 'tanh':
 
             return 1 - x**2
 
-ssssssssssss        elif act_func == 'relu':
+        elif act_func == 'relu':
 
             return 1*(x >= 0)
 
@@ -205,7 +205,7 @@ ssssssssssss        elif act_func == 'relu':
         param: y: correct labels
         type: y: ndarray
         param: y_pred: predicted labels
-        type: y_pred: ndarray 
+        type: y_pred: ndarray
         return: selected cost function
         """
 
@@ -227,13 +227,13 @@ ssssssssssss        elif act_func == 'relu':
 
 
     def cost_function_derivative(self, y, ypred):
-       """
+        """
         Takes the derivative of the selected cost function
 
         param: y: correct labels
         type: y: ndarray
         param: y_pred: predicted labels
-        type: y_pred: ndarray 
+        type: y_pred: ndarray
         return: costfunction derivative
         """
 
@@ -246,12 +246,12 @@ ssssssssssss        elif act_func == 'relu':
 
     def accuracy(self, y, ypred):
         """
-        Measures the number of correctly 
-        classified classes 
+        Measures the number of correctly
+        classified classes
         param: y: correct labels
         type: y: ndarray
         param: y_pred: predicted labels
-        type: y_pred: ndarray 
+        type: y_pred: ndarray
         return: accuracy
         """
         cls_pred = np.argmax(ypred, axis=1)
@@ -261,7 +261,7 @@ ssssssssssss        elif act_func == 'relu':
     def feed_forward(self, x, isTraining = True):
         """
         Doing the forward propagation
-        
+
         param: x: Data
         type: x: ndarray
         param: isTraining: Set to false if using a finished
@@ -351,7 +351,7 @@ ssssssssssss        elif act_func == 'relu':
             eta = lambda t : eta0
 
         num_batch = int(self.nTrain/batchSize)
-        
+
         self.convergence_rate = {'Epoch': [], 'Test Accuracy': []}
         for epoch in range(epochs +1):
 

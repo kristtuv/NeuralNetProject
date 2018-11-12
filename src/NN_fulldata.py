@@ -1,6 +1,6 @@
-"""Calculates accuracy and cost of 
+"""Calculates accuracy and cost of
 training, test and critiacal set
-run on all the data available in 
+run on all the data available in
 network/fetch_2D_data"""
 
 import numpy as np
@@ -20,8 +20,8 @@ X, Y, X_crit, Y_crit= fetch_data()
 # nn.TrainNN(epochs = 100, eta = 0.001, n_print=5)
 
 # 100% ACCURACY MADDAFAKKA
-nn = NeuralNet(X,Y, nodes = [X.shape[1], 100,100,2], activations = ['sigmoid', 'sigmoid',None],\
-                cost_func='log')#, regularization='l2', lamb=0.1)
+nn = NeuralNet(X,Y, nodes = [X.shape[1],10,2], activations = ['tanh',None],\
+                cost_func='log', regularization='l2', lamb=0.01)
 nn.split_data(frac=0.5, shuffle=True)
 nn.TrainNN(epochs = 200, eta0 = 0.01, n_print=5)
 
