@@ -25,7 +25,7 @@ from time import time
 def plot_convergence():
     """
     Ploting the convergence rate of the 6 best models
-    calculated in best_architectures 
+    calculated in best_architectures
     """
 
     ########################################################
@@ -306,6 +306,6 @@ def plot_regularization():
 
 
 if __name__=='__main__':
-    # best_architecture()
-    # plot_regularization()
+    #best_architecture()
+    #plot_regularization()
     plot_convergence()
