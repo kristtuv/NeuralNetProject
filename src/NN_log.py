@@ -1,3 +1,6 @@
+"""
+Neural network calcualting logistic regression
+"""
 import sys
 sys.path.append('network')
 sys.path.append('../')
