@@ -1,4 +1,6 @@
-"""Needs description"""
+"""Program for calculating logistic
+regression evalutated on two
+dimensional ising model"""
 
 import sys
 sys.path.append('network')
@@ -11,6 +13,10 @@ import time
 import matplotlib.pylab as plt
 
 def check_batch():
+    """
+    Finding the impact of batch sizes and learining
+    rate on the cost and acuracy
+    """
     num_batches = [1, 100, 500, 1000, 65000]
     rates = [0.001, 0.01, 0.1]
     n = len(num_batches)
@@ -57,6 +63,9 @@ def check_batch():
         print("-"*80)
 
 def check_reg():
+    """
+    Checking impact of regularization in logistic regression.
+    """
 
     lambdas = np.logspace(-5, 4, 10)
     regs = ['l2', 'l1']
@@ -105,6 +114,9 @@ def check_reg():
 
 
 def check_best():
+    """
+    Finding the best logistic regression model
+    """
 
     model = LogReg_Ising()
     model.optimize(m = 500, epochs = 200, eta = 0.001)
