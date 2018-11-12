@@ -45,6 +45,10 @@ Y = Data[1][:n_samples]
 #X = np.c_[np.ones(X.shape[0]), X]
 
 def reg():
+    """
+    Doing the linear regression using
+    a neural network
+    """
 
     lambdas = np.logspace(-4, 2, 7)
     #lambdas = [0.01, 0.1]
@@ -79,6 +83,9 @@ def reg():
 
 
 def plot():
+    """
+    Ploting the matrix of the coupling constants
+    """
 
     n = [400, 10000]
     fig, axarr = plt.subplots(nrows=2, ncols=3)

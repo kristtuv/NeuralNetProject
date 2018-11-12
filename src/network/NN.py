@@ -294,8 +294,8 @@ ssssssssssss        elif act_func == 'relu':
         """
         Function for doing the backpropagation
 
-        param: yTrue:
-        type: yTrue:
+        param: yTrue: True values of y
+        type: yTrue: ndarray
         return: None
         """
         if yTrue is None:
