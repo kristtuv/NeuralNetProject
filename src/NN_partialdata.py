@@ -25,7 +25,7 @@ from time import time
 def plot_convergence():
     """
     Ploting the convergence rate of the 6 best models
-    calculated in best_architectures 
+    calculated in best_architectures. 
     """
 
     ########################################################
@@ -96,6 +96,9 @@ def plot_convergence():
     plt.tight_layout()
     plt.show()
 def best_architecture():
+    """
+    Finding best architectures for neural network
+    """
 
     #######################################################
     ###############Defining parameters#####################
@@ -163,8 +166,10 @@ def best_architecture():
 
 
 def plot_regularization():
-
-     #######################################################
+    """
+    Ploting different models as a function of regularization strength
+    """
+    #######################################################
     ###############Defining parameters#####################
     #######################################################
     lambs = np.logspace(-4, 0, 5)
