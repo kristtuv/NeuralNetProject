@@ -1,4 +1,4 @@
-# Ising Model Analysis using linear regregreesion and neural networks
+# Ising Model Analysis using linear regregreesion and neural networks   
 Project doing linear regression, logistic regression and binary classification using a simple neural network on data from the 1D and 2D Ising model    
 ## Build with    
 scikit-image    0.13.1      
@@ -27,7 +27,7 @@ Results from linear regression and logistic regression simulations
 **NN_log.py:** Program for testing neural network architecture onpartial dataset    
 **linreg_ising.py:** Testing linear regression models on the one dimensional Ising model
 **logreg_main.py:** Testing logistic regression on the one dimensional Ising model    
-**fetch_2D_data.py:** Handeling the data for 2D ising model    
+**fetch_2D_data.py:** Handeling the data for 2D ising model       
 **misc:** Contians programs used to generate example plots or testing concepts    
 **network:** Package    
 * **NN.py:** Class containing neural network methods    
