@@ -38,5 +38,5 @@ Results from linear regression and logistic regression simulations
     
 ## Authors    
     
-* **Tommy Myrvik** - (https://github.com/tommymy)    
+* **Tommy Myrvik** - (https://github.com/myrvixen)    
 * **Kristian Tuv** - (https://github.com/kristtuv)    
